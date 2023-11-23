@@ -7,7 +7,7 @@ services:
     environment:
       - TZ=Europe/Moscow
     volumes:
-      - /home/.VOLUMES/bank_scrapper/source:/source:rw
+      - /home/user/.volumes/bank_scrapper/source:/source:rw
     tty: true
     working_dir: /source
     command: ["python", "main.py"]
