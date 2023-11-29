@@ -3,7 +3,24 @@ from httpx import AsyncClient
 from config import PROXY6NET_PROXIES
 
 
-class TinkoffBank:
+class Tinkoff:
+    @staticmethod
+    async def get_bank_pa_balances(token: str, pa_numbers_list: list[str]):
+        headers = {'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json'}
+        url_operation = 'https://business.tinkoff.ru/openapi/api/v1/bank-accounts'
+        r_balances = await AsyncClient(proxies=PROXY6NET_PROXIES).get(
+            url=url_operation,
+            headers=headers
+        )
+        json_balances_list = r_balances.json()
+
+        pa_balances = {}
+        for rc in json_balances_list:
+            if rc['accountNumber'] in pa_numbers_list:
+                pa_balances[rc['accountNumber']] += rc['balance']['otb']
+
+        return pa_balances
+
     @staticmethod
     async def get_statement(token: str, rc_number: int, from_date: str) -> list:
         """

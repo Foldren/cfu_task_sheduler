@@ -4,7 +4,33 @@ from httpx import AsyncClient, ConnectError
 from config import PROXY6NET_PROXIES
 
 
-class ModuleBank:
+class Module:
+    @staticmethod
+    async def get_bank_pa_balances(token: str, pa_numbers_list: list[str]):
+        headers = {'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json'}
+
+        async with AsyncClient(proxies=PROXY6NET_PROXIES) as async_session:
+            while True:
+                try:
+                    r_company_info = await async_session.post(
+                        url="https://api.modulbank.ru/v1/account-info",
+                        headers=headers
+                    )
+                except ConnectError:
+                    await sleep(1)
+                    continue
+                break
+
+            json_company_info = r_company_info.json()
+
+            # Берем account_id шники -----------------------------------------------------------------------------------
+            balances = {}
+            for rc in json_company_info[0]['bankAccounts']:
+                if rc['number'] in pa_numbers_list:
+                    balances[rc['number']] = rc['balance']
+
+            return balances
+
     @staticmethod
     async def get_statement(token: str, rc_number: int, from_date: str):
         """

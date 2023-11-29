@@ -4,7 +4,32 @@ from httpx import AsyncClient
 from config import PROXY6NET_PROXIES
 
 
-class TochkaBank:
+class Tochka:
+    @staticmethod
+    async def get_bank_pa_balances(token: str, pa_numbers_list: list[str]):
+        headers = {'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json'}
+
+        async with AsyncClient(proxies=PROXY6NET_PROXIES) as async_session:
+            r_balances = await async_session.get(
+                url="https://enter.tochka.com/uapi/open-banking/v1.0/balances",
+                headers=headers
+            )
+
+            if r_balances.status_code != 200:
+                raise Exception(f"[error]: Error on api tochka on operation get balances:\n\n {r_balances.text}")
+
+            json_balances = r_balances.json()["Data"]["Balance"]
+
+            # Получаем балансы -----------------------------------------------------------------------------------------
+            balances = {}
+            for pa in json_balances:
+                pa_number = pa['accountId'].split("/")[0]
+
+                if pa_number in pa_numbers_list:
+                    balances[pa_number] = pa['Amount']['amount']
+
+            return balances
+
     @staticmethod
     async def get_statement(token: str, rc_number: int, from_date: str) -> list[dict]:
         """
@@ -27,7 +52,7 @@ class TochkaBank:
             )
 
             if r_company_info.status_code != 200:
-                raise Exception(f"[error]: ERROR ON API TOCHKA:\n\n {r_company_info.text}")
+                raise Exception(f"[error]: Error on api tochka:\n\n {r_company_info.text}")
 
             r_company_accounts = r_company_info.json()['Data']['Account']
             account_id = ""

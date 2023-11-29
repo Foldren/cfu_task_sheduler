@@ -1,9 +1,9 @@
 from datetime import datetime
 from traceback import format_exc
 from cryptography.fernet import Fernet
-from banks.module import ModuleBank
-from banks.tinkoff import TinkoffBank
-from banks.tochka import TochkaBank
+from banks.module import Module
+from banks.tinkoff import Tinkoff
+from banks.tochka import Tochka
 from config import SECRET_KEY
 from models import PaymentAccount, UserBank, DataCollect
 
@@ -33,19 +33,19 @@ class Statement:
         statements = None
         match bank.support_bank.name:
             case 'Тинькофф':
-                statements = await TinkoffBank.get_statement(
+                statements = await Tinkoff.get_statement(
                     token=decrypt_token,
                     rc_number=payment_account.number,
                     from_date=from_date,
                 )
             case 'Модуль':
-                statements = await ModuleBank.get_statement(
+                statements = await Module.get_statement(
                     token=decrypt_token,
                     rc_number=payment_account.number,
                     from_date=from_date,
                 )
             case 'Точка':
-                statements = await TochkaBank.get_statement(
+                statements = await Tochka.get_statement(
                     token=decrypt_token,
                     rc_number=payment_account.number,
                     from_date=from_date,
