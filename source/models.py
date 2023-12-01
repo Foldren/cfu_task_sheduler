@@ -3,6 +3,7 @@ from enum import IntEnum, Enum
 from tortoise import Model
 from tortoise.fields import BigIntField, ForeignKeyRelation, ForeignKeyField, ReverseRelation, TextField, OnDelete, \
     BinaryField, DateField, IntEnumField, CharField, CharEnumField, DecimalField
+from tortoise.timezone import now
 
 
 class SupportBankName(str, Enum):
@@ -21,6 +22,8 @@ class SupportBank(Model):
     class Meta:
         table = "support_banks"
 
+# ----------------------------------------------------------------------------------------------------------------------
+
 
 class UserBank(Model):
     id = BigIntField(pk=True)
@@ -35,9 +38,15 @@ class UserBank(Model):
         table = "user_banks"
 
 
+# ----------------------------------------------------------------------------------------------------------------------
+
 class PaymentAccountStatus(IntEnum):
     active = 1
     close = 0
+
+
+def get_start_current_year_date():
+    return datetime(year=now().year, day=1, month=1)
 
 
 class PaymentAccount(Model):
@@ -46,13 +55,15 @@ class PaymentAccount(Model):
     user_bank: ForeignKeyRelation['UserBank'] = ForeignKeyField('models.UserBank', on_delete=OnDelete.CASCADE,
                                                                 related_name="payment_accounts", null=False)
     data_collects: ReverseRelation['PaymentAccount']
-    start_date = DateField(null=False, default=datetime(year=datetime.now().year, month=1, day=1))
-    number = CharField(max_length=50, null=False)
+    start_date = DateField(null=True, default=get_start_current_year_date)
+    number = CharField(max_length=50, null=False, unique=True)
     balance = CharField(max_length=30, null=True)
     status = IntEnumField(enum_type=PaymentAccountStatus, description="Статус расчётного счета", default=1)
 
     class Meta:
         table = "payment_accounts"
+
+# ----------------------------------------------------------------------------------------------------------------------
 
 
 class DataCollectType(str, Enum):
