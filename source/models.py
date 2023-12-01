@@ -8,7 +8,6 @@ class SupportBankName(str, Enum):
     tinkoff = "Тинькофф"
     module = "Модуль"
     tochka = "Точка"
-    ozon = "Ozon"
 
 
 class SupportBank(Model):
@@ -47,7 +46,6 @@ class PaymentAccount(Model):
                                                                 related_name="payment_accounts", null=False)
     data_collects: ReverseRelation['PaymentAccount']
     start_date = DateField(null=False)
-    last_date = DateField(null=True)
     number = CharField(max_length=50, null=False)
     balance = CharField(max_length=30, null=True)
     status = IntEnumField(enum_type=PaymentAccountStatus, description="Статус расчётного счета", default=1)

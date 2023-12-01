@@ -25,10 +25,7 @@ class Statement:
         decrypt_token = Fernet(SECRET_KEY).decrypt(bank.token).decode('utf-8')
 
         # Фиксируем дату, с которой нужно начать подгрузку операций из выписок
-        if payment_account.last_date is None:
-            from_date = payment_account.start_date
-        else:
-            from_date = payment_account.last_date
+        from_date = payment_account.start_date
 
         statements = None
         match bank.support_bank.name:
@@ -52,7 +49,7 @@ class Statement:
                 )
 
         # Меняем дату последней подгрузки на сегодня
-        payment_account.last_date = datetime.now().date()
+        payment_account.start_date = datetime.now().date()
         await payment_account.save()
 
         return statements
