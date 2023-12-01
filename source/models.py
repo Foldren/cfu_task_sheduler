@@ -46,7 +46,7 @@ class PaymentAccount(Model):
     user_bank: ForeignKeyRelation['UserBank'] = ForeignKeyField('models.UserBank', on_delete=OnDelete.CASCADE,
                                                                 related_name="payment_accounts", null=False)
     data_collects: ReverseRelation['PaymentAccount']
-    start_date = DateField(null=False, default=datetime.now())
+    start_date = DateField(null=False, default=datetime(year=datetime.now().year, month=1, day=1))
     number = CharField(max_length=50, null=False)
     balance = CharField(max_length=30, null=True)
     status = IntEnumField(enum_type=PaymentAccountStatus, description="Статус расчётного счета", default=1)
