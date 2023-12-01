@@ -1,3 +1,4 @@
+from datetime import datetime
 from enum import IntEnum, Enum
 from tortoise import Model
 from tortoise.fields import BigIntField, ForeignKeyRelation, ForeignKeyField, ReverseRelation, TextField, OnDelete, \
@@ -45,7 +46,7 @@ class PaymentAccount(Model):
     user_bank: ForeignKeyRelation['UserBank'] = ForeignKeyField('models.UserBank', on_delete=OnDelete.CASCADE,
                                                                 related_name="payment_accounts", null=False)
     data_collects: ReverseRelation['PaymentAccount']
-    start_date = DateField(null=False)
+    start_date = DateField(null=False, default=datetime.now())
     number = CharField(max_length=50, null=False)
     balance = CharField(max_length=30, null=True)
     status = IntEnumField(enum_type=PaymentAccountStatus, description="Статус расчётного счета", default=1)
