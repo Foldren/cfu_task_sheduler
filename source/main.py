@@ -15,7 +15,7 @@ async def load_statements():
     await statement.load()
 
 
-@app.task(every("10 sec"))
+@app.task(every("5 minutes"))
 async def load_balances():
     balance = Balance()
     await balance.status_message("start")
