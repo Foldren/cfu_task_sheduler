@@ -81,11 +81,11 @@ class Statement:
                             data_collects.append(DataCollect(
                                 payment_account_id=payment_account.id,
                                 trxn_date=operation['op_date'],
-                                executor_name=operation['partner_name'],
+                                counterparty_name=operation['partner_name'],
                                 type=operation['op_type'],
                                 support_bank_id=support_bank.id,
                                 amount=operation['op_volume'],
-                                contragent_inn=operation['partner_inn'],
+                                counterparty_inn=operation['partner_inn'],
                             ))
                 except Exception:
                     print(format_exc())

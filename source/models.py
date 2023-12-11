@@ -80,11 +80,10 @@ class DataCollect(Model):
                                                                       on_delete=OnDelete.RESTRICT,
                                                                       related_name="data_collects", null=False)
     trxn_date = DateField(null=False, index=True)
-    executor_chat_id = CharField(max_length=50, default='Нет chat_id', null=True)
-    executor_name = CharField(max_length=100, null=False)
+    counterparty_name = CharField(max_length=100, null=False)
     type = CharEnumField(enum_type=DataCollectType, description='Тип операции', null=False)
     amount = DecimalField(max_digits=19, decimal_places=2, null=False)
-    contragent_inn = CharField(max_length=30, default='', null=True)
+    counterparty_inn = CharField(max_length=30, default='', null=True)
 
     class Meta:
         table = "data_collects"
