@@ -8,10 +8,13 @@ class Tinkoff:
     async def get_bank_pa_balances(token: str, pa_numbers_list: list[str]):
         headers = {'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json'}
         url_operation = 'https://business.tinkoff.ru/openapi/api/v1/bank-accounts'
-        r_balances = await AsyncClient(proxies=PROXY6NET_PROXIES).get(
-            url=url_operation,
-            headers=headers
-        )
+
+        async with AsyncClient(proxies=PROXY6NET_PROXIES) as async_session:
+            r_balances = await async_session.get(
+                url=url_operation,
+                headers=headers
+            )
+
         json_balances_list = r_balances.json()
 
         pa_balances = {}
@@ -41,17 +44,18 @@ class Tinkoff:
         till_date_frmt = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
         last_operations = []
         while True:
-            r_operations = await AsyncClient(proxies=PROXY6NET_PROXIES).get(
-                url=url_operation,
-                headers=headers,
-                params={
-                    'accountNumber': rc_number,
-                    'limit': 5000,
-                    'from': str(from_date_frmt),
-                    'to': str(till_date_frmt),
-                    'operationStatus': ['Transaction'],
-                }
-            )
+            async with AsyncClient(proxies=PROXY6NET_PROXIES) as async_session:
+                r_operations = await async_session.get(
+                    url=url_operation,
+                    headers=headers,
+                    params={
+                        'accountNumber': rc_number,
+                        'limit': 5000,
+                        'from': str(from_date_frmt),
+                        'to': str(till_date_frmt),
+                        'operationStatus': ['Transaction'],
+                    }
+                )
 
             if r_operations.status_code != 200:
                 raise Exception(f"[error]: ERROR ON API TINKOFF:\n\n {r_operations.text}")
