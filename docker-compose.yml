@@ -1,13 +1,16 @@
 version: "3.3"
 services:
-  bank_scrapper:
+  bank_consumer:
     build: .
-    image: bank_scrapper
     container_name: bank_scrapper
+    restart: always
     environment:
       - TZ=Europe/Moscow
-    volumes:
-      - /home/user/.volumes/bank_scrapper/source:/source:rw
-    tty: true
-    working_dir: /source
-    command: ["python", "main.py"]
+    env_file:
+      - ./source/.env
+    networks:
+      - uprav_cfu_network
+
+networks:
+  uprav_cfu_network:
+    external: true
