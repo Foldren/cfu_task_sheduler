@@ -1,3 +1,4 @@
+cffi
 rocketry~=2.5.1
 pydantic~=1.10.0
 httpx~=0.25.0
