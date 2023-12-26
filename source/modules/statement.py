@@ -5,6 +5,7 @@ from banks.module import Module
 from banks.tinkoff import Tinkoff
 from banks.tochka import Tochka
 from config import SECRET_KEY
+from decorators import exception_handler
 from models import PaymentAccount, UserBank, DataCollect
 
 
@@ -54,6 +55,7 @@ class Statement:
 
         return statements
 
+    @exception_handler
     async def load(self) -> None:
         """
         Основная функция, для генерации списка строк с операциями data_collect,
