@@ -1,8 +1,8 @@
 version: "3.3"
 services:
-  bank_consumer:
+  bank_tasks:
     build: .
-    container_name: bank_scrapper
+    container_name: bank_tasks
     restart: always
     environment:
       - TZ=Europe/Moscow
