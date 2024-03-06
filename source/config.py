@@ -1,8 +1,14 @@
-from os import getenv
+from os import environ
+from pathlib import Path
 from dotenv import load_dotenv
+
 
 load_dotenv()
 
-POSTGRES_URL = getenv("POSTGRES_URL")
-SECRET_KEY = getenv('SECRET_KEY')
-PROXY6NET_PROXIES = {"socks5://": getenv('PROXY_HTTPS_URL')}
+IS_THIS_LOCAL = "Pycharm" in str(Path.cwd())
+
+POSTGRES_URL = environ['PG_URL']
+
+SECRET_KEY = environ['SECRET_KEY']
+
+PROXY6NET_PROXIES = {"socks5://": environ['PROXY_HTTPS_URL']}
