@@ -110,6 +110,7 @@ class Module:
                     'op_volume': volume_operation,
                     'op_type': type_operation,
                     'op_date': trxn_date,
+                    'op_id': operation['id'],
                 })
 
             result_data_list.reverse()

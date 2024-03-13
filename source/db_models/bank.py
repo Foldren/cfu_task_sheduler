@@ -14,7 +14,7 @@ class SupportBankName(str, Enum):
 
 class SupportBank(Model):
     id = BigIntField(pk=True)
-    name = CharEnumField(enum_type=SupportBankName, description='Название банка', null=False)
+    name = CharEnumField(enum_type=SupportBankName, description='Название банка')
     logo_url = TextField(maxlength=320, null=True, default='')
     user_banks: ReverseRelation['UserBank']
     data_collects: ReverseRelation['DataCollect']
@@ -27,12 +27,12 @@ class SupportBank(Model):
 
 class UserBank(Model):
     id = BigIntField(pk=True)
-    user_id = CharField(max_length=100, null=False, index=True)
-    support_bank: ForeignKeyRelation['SupportBank'] = ForeignKeyField('models.SupportBank', on_delete=OnDelete.CASCADE,
-                                                                      related_name="user_banks", null=False)
+    user_id = CharField(max_length=100, index=True)
+    support_bank: ForeignKeyRelation['SupportBank'] = ForeignKeyField('bank.SupportBank', on_delete=OnDelete.CASCADE,
+                                                                      related_name="user_banks")
     payment_accounts: ReverseRelation['PaymentAccount']
-    name = CharField(max_length=50, null=False)
-    token = BinaryField(null=False)
+    name = CharField(max_length=50)
+    token = BinaryField()
 
     class Meta:
         table = "user_banks"
@@ -51,13 +51,13 @@ def get_start_current_year_date():
 
 class PaymentAccount(Model):
     id = BigIntField(pk=True)
-    legal_entity_id = CharField(max_length=100, null=False, index=True)
-    user_bank: ForeignKeyRelation['UserBank'] = ForeignKeyField('models.UserBank', on_delete=OnDelete.CASCADE,
-                                                                related_name="payment_accounts", null=False)
+    legal_entity_id = CharField(max_length=100, index=True)
+    user_bank: ForeignKeyRelation['UserBank'] = ForeignKeyField('bank.UserBank', on_delete=OnDelete.CASCADE,
+                                                                related_name="payment_accounts")
     data_collects: ReverseRelation['PaymentAccount']
     start_date = DateField(null=True, default=get_start_current_year_date)
-    number = CharField(max_length=50, null=False, unique=True)
-    balance = CharField(max_length=30, null=True)
+    number = CharField(max_length=50, unique=True)
+    balance = CharField(max_length=30, null=True, default="0")
     status = IntEnumField(enum_type=PaymentAccountStatus, description="Статус расчётного счета", default=1)
 
     class Meta:
@@ -73,17 +73,18 @@ class DataCollectType(str, Enum):
 
 class DataCollect(Model):
     id = BigIntField(pk=True)
-    payment_account: ForeignKeyRelation['PaymentAccount'] = ForeignKeyField('models.PaymentAccount',
+    payment_account: ForeignKeyRelation['PaymentAccount'] = ForeignKeyField('bank.PaymentAccount',
                                                                             on_delete=OnDelete.CASCADE,
-                                                                            related_name="data_collects", null=False)
-    support_bank: ForeignKeyRelation['SupportBank'] = ForeignKeyField('models.SupportBank',
+                                                                            related_name="data_collects")
+    support_bank: ForeignKeyRelation['SupportBank'] = ForeignKeyField('bank.SupportBank',
                                                                       on_delete=OnDelete.RESTRICT,
-                                                                      related_name="data_collects", null=False)
-    trxn_date = DateField(null=False, index=True)
-    counterparty_name = CharField(max_length=100, null=False)
-    type = CharEnumField(enum_type=DataCollectType, description='Тип операции', null=False)
-    amount = DecimalField(max_digits=19, decimal_places=2, null=False)
+                                                                      related_name="data_collects")
+    trxn_id = CharField(max_length=100, null=True)
+    trxn_date = DateField(index=True)
+    counterparty_name = CharField(max_length=100)
     counterparty_inn = CharField(max_length=30, default='', null=True)
+    type = CharEnumField(enum_type=DataCollectType, description='Тип операции')
+    amount = DecimalField(max_digits=19, decimal_places=2)
 
     class Meta:
         table = "data_collects"

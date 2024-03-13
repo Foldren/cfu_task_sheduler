@@ -122,6 +122,7 @@ class Tochka:
                 'op_volume': volume_operation if type_operation == "Доход" else -round(volume_operation, 2),
                 'op_type': type_operation,
                 'op_date': trxn_date,
+                'op_id': operation['transactionId'],
             })
 
         return result_data_list

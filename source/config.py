@@ -7,7 +7,16 @@ load_dotenv()
 
 IS_THIS_LOCAL = "Pycharm" in str(Path.cwd())
 
-POSTGRES_URL = environ['PG_URL']
+TORTOISE_CONFIG = {
+    "connections": {
+        "telegram": environ['TG_PG_URL'],
+        "bank": environ['BANK_PG_URL']
+    },
+    "apps": {
+        "telegram": {"models": ["db_models.telegram"], "default_connection": "telegram"},
+        "bank": {"models": ["db_models.bank"], "default_connection": "bank"}
+    }
+}
 
 SECRET_KEY = environ['SECRET_KEY']
 

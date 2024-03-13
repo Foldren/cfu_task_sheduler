@@ -4,7 +4,7 @@ from banks.tinkoff import Tinkoff
 from banks.tochka import Tochka
 from config import SECRET_KEY
 from decorators import exception_handler
-from models import UserBank, PaymentAccount
+from db_models.bank import UserBank, PaymentAccount
 
 
 class Balance:
@@ -49,6 +49,8 @@ class Balance:
         Основная функция, для обновления балансов расчетных счетов в бд
 
         """
+        await self.status_message("start")
+
         users_banks = await UserBank.all()
 
         pa_balances = {}
@@ -66,5 +68,7 @@ class Balance:
 
         if payment_accounts:
             await PaymentAccount.bulk_update(payment_accounts, fields=['balance'])
+
+        await self.status_message("end")
 
 

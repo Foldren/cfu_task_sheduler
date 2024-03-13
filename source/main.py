@@ -1,34 +1,29 @@
-from asyncio import create_task, run
-from rocketry import Rocketry
-from rocketry.conds import daily, every
+from os import system
+from taskiq import TaskiqScheduler, InMemoryBroker
+from taskiq.schedule_sources import LabelScheduleSource
 from tortoise import run_async
 from init_db import init_db
 from modules.balance import Balance
 from modules.statement import Statement
 
-app = Rocketry(execution="async")
+
+broker = InMemoryBroker()
+scheduler = TaskiqScheduler(broker=broker, sources=[LabelScheduleSource(broker)])
 
 
-@app.task(daily.between("04:00", "04:01"))
-async def load_statements():
-    statement = Statement()
-    await statement.load()
-
-
-@app.task(every("5 minutes"))
+# Запускаем каждые 5 минут
+@broker.task(schedule=[{"cron": "*/5 * * * *"}])
 async def load_balances():
-    balance = Balance()
-    await balance.status_message("start")
-    await balance.load()
-    await balance.status_message("end")
+    await Balance().load()
 
 
-async def main():
-    await Statement.status_message('start_statement_machine')
-    rocketry_task = create_task(app.serve())
-    await rocketry_task
+# Запускаем в 4 утра каждый день
+@broker.task(schedule=[{"cron": "0 4 * * *", "cron_offset": "Europe/Moscow"}])
+async def load_statements():
+    await Statement().load()
 
 
 if __name__ == '__main__':
     run_async(init_db())
-    run(main())
+    system("taskiq scheduler --skip-first-run main:scheduler")
+
