@@ -2,7 +2,7 @@ version: "3.3"
 services:
   bank_tasks:
     build: .
-    container_name: bank_tasks
+    container_name: task_sheduler
     restart: always
     environment:
       - TZ=Europe/Moscow
