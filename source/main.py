@@ -30,11 +30,16 @@ async def delete_incorrect_declaration_notes():
     query = Declaration.filter(status='no_file', date__lte=datetime.now(tz=timezone("Europe/Moscow"))).all()
     inc_declarations = await query
 
-    for declr in inc_declarations:
-        if declr.image_url is not None:
-            await ContentApi(declr.user_id).delete(file_url=declr.image_url)
+    if inc_declarations:
+        for declr in inc_declarations:
+            if declr.image_url is not None:
+                await ContentApi(declr.user_id).delete(file_url=declr.image_url)
 
-    await query.delete()
+        await query.delete()
+
+        await Logger(APP_NAME).success(msg="Декларации с некорретктной ссылкой удалены.", func_name="delete_incorr_declrs")
+    else:
+        await Logger(APP_NAME).info(msg="У всех деклараций корректная ссылка.", func_name="delete_incorr_declrs")
 
 
 if __name__ == '__main__':
