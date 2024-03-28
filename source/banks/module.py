@@ -6,7 +6,14 @@ from config import PROXY6NET_PROXIES
 
 class Module:
     @staticmethod
-    async def get_bank_pa_balances(token: str, pa_numbers_list: list[str]):
+    async def get_bank_pa_balances(token: str, pa_numbers_list: list[str]) -> dict:
+        """
+        Функция для получения балансов по выбранным расчетным счетам
+        :param token: токен Модуль банка
+        :param pa_numbers_list: номера счетов
+        :return: объект dict[pa_number, pa_balance]
+        """
+
         headers = {'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json'}
 
         async with AsyncClient(proxies=PROXY6NET_PROXIES) as async_session:
@@ -32,15 +39,15 @@ class Module:
             return balances
 
     @staticmethod
-    async def get_statement(token: str, rc_number: int, from_date: str):
+    async def get_statement(token: str, rc_number: int, from_date: str) -> list[dict]:
         """
         Функция для получения выписок по счету в Модуль банке от заданной даты до текущего времени
-
         :param token: токен клиентского Модуль Банка
         :param rc_number: номер расчетного счета клиента
         :param from_date: дата начала периода отгрузки выписки (в формате 2023-07-13)
-        :return:
+        :return: объект list[dict]
         """
+
         headers = {'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json'}
 
         async with AsyncClient(proxies=PROXY6NET_PROXIES) as async_session:

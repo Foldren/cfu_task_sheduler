@@ -6,7 +6,14 @@ from config import PROXY6NET_PROXIES
 
 class Tochka:
     @staticmethod
-    async def get_bank_pa_balances(token: str, pa_numbers_list: list[str]):
+    async def get_bank_pa_balances(token: str, pa_numbers_list: list[str]) -> dict:
+        """
+        Функция для получения балансов по выбранным расчетным счетам
+        :param token: токен Точка банка
+        :param pa_numbers_list: номера счетов
+        :return: объект dict[pa_number, pa_balance]
+        """
+
         headers = {'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json'}
 
         async with AsyncClient(proxies=PROXY6NET_PROXIES) as async_session:
@@ -34,11 +41,10 @@ class Tochka:
     async def get_statement(token: str, rc_number: int, from_date: str) -> list[dict]:
         """
         Функция для получения выписок по счету в Точка банке от заданной даты до текущего времени
-
-        @param token: токен клиентского Точка банка
-        @param rc_number: номер расчетного счета клиента
-        @param from_date: дата начала периода отгрузки выписки (в формате 2023-07-13)
-        @return: list[dict]
+        :param token: токен клиентского Точка банка
+        :param rc_number: номер расчетного счета клиента
+        :param from_date: дата начала периода отгрузки выписки (в формате 2023-07-13)
+        :return: list[dict]
         """
 
         headers = {'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json'}

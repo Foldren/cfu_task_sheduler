@@ -1,5 +1,4 @@
 from datetime import datetime
-from traceback import format_exc
 from cryptography.fernet import Fernet
 from banks.module import Module
 from banks.tinkoff import Tinkoff
@@ -13,7 +12,21 @@ from modules.logger import Logger
 
 class Statement:
     @staticmethod
-    async def __load_payment_account_statement(payment_account: PaymentAccount) -> list:
+    async def __load_payment_account_statement(payment_account: PaymentAccount) -> list[dict]:
+        """
+        Метод подгрузки выписок по расчетному счету
+        :param payment_account: объект PaymentAccount
+        :return: объект list[dict_item]
+
+        dict_item = {'partner_inn': ИНН контрагента,
+                     'partner_name': имя контрагента,\n
+                     'op_volume': объем операции в рублях,\n
+                     'op_type': тип операции Доход/Расход,\n
+                     'op_date': дата операции,\n
+                     'op_id': id транзакции
+                     }
+        """
+
         bank = await payment_account.user_bank.first().select_related('support_bank')
         decrypt_token = Fernet(SECRET_KEY).decrypt(bank.token).decode('utf-8')
 
@@ -52,8 +65,6 @@ class Statement:
         """
         Основная функция, для генерации списка строк с операциями data_collect,
         с последующим добавлением в бд
-
-        :return:
         """
 
         await Logger(APP_NAME).info(msg="Начат процесс подрузки выписок.", func_name="load_statement")

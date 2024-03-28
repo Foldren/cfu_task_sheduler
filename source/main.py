@@ -16,7 +16,7 @@ from modules.statement import Statement
 @aiocron.crontab("*/5 * * * *")
 async def load_balances():
     """
-    Таск на подгрузку балансов в user_payment_accounts.
+    Таск на подгрузку балансов в user_payment_accounts
     """
 
     await Balance().load()
@@ -26,7 +26,7 @@ async def load_balances():
 @aiocron.crontab("0 4 * * *", tz=timezone("Europe/Moscow"))
 async def load_statements():
     """
-    Таск на подгрузку выписок в user_data_collects.
+    Таск на подгрузку выписок в user_data_collects
     """
 
     await Statement().load()
@@ -36,7 +36,7 @@ async def load_statements():
 @aiocron.crontab("* */24 * * *")
 async def delete_incorrect_declaration_notes():
     """
-    Таск на удаление деклараций с некорректными ссылками с повторным удалением на стороне контентного мс.
+    Таск на удаление деклараций с некорректными ссылками с повторным удалением на стороне контентного мс
     """
 
     query = Declaration.filter(status='no_file', date__lte=datetime.now(tz=timezone("Europe/Moscow"))).all()

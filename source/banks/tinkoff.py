@@ -6,6 +6,13 @@ from config import PROXY6NET_PROXIES
 class Tinkoff:
     @staticmethod
     async def get_bank_pa_balances(token: str, pa_numbers_list: list[str]):
+        """
+        Функция для получения балансов по выбранным расчетным счетам
+        :param token: токен Тинькофф банка
+        :param pa_numbers_list: номера счетов
+        :return: объект dict[pa_number, pa_balance]
+        """
+
         headers = {'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json'}
         url_operation = 'https://business.tinkoff.ru/openapi/api/v1/bank-accounts'
 
