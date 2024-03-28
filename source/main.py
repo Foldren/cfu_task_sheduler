@@ -15,18 +15,30 @@ from modules.statement import Statement
 # Запускаем каждые 5 минут
 @aiocron.crontab("*/5 * * * *")
 async def load_balances():
+    """
+    Таск на подгрузку балансов в user_payment_accounts.
+    """
+
     await Balance().load()
 
 
 # Запускаем в 4 утра каждый день
 @aiocron.crontab("0 4 * * *", tz=timezone("Europe/Moscow"))
 async def load_statements():
+    """
+    Таск на подгрузку выписок в user_data_collects.
+    """
+
     await Statement().load()
 
 
 # Запускаем каждые 24 часа
 @aiocron.crontab("* */24 * * *")
 async def delete_incorrect_declaration_notes():
+    """
+    Таск на удаление деклараций с некорректными ссылками с повторным удалением на стороне контентного мс.
+    """
+
     query = Declaration.filter(status='no_file', date__lte=datetime.now(tz=timezone("Europe/Moscow"))).all()
     inc_declarations = await query
 
@@ -37,7 +49,7 @@ async def delete_incorrect_declaration_notes():
 
         await query.delete()
 
-        await Logger(APP_NAME).success(msg="Декларации с некорретктной ссылкой удалены.", func_name="delete_incorr_declrs")
+        await Logger(APP_NAME).success(msg="Декларации с некорректной ссылкой удалены.", func_name="delete_incorr_declrs")
     else:
         await Logger(APP_NAME).info(msg="У всех деклараций корректная ссылка.", func_name="delete_incorr_declrs")
 

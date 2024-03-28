@@ -11,6 +11,13 @@ from modules.logger import Logger
 class Balance:
     @staticmethod
     async def __get_bank_rc_balances(user_bank: UserBank) -> dict:
+        """
+        Функция для подгрузки балансов по расчетным счета банка.
+        
+        :param user_bank: банк, по которому требуется подгрузить балансы UserBank
+        :return: значения в формате dict[payment_account_number] = amount
+        """
+
         decrypt_token = Fernet(SECRET_KEY).decrypt(user_bank.token).decode('utf-8')
         support_bank = await user_bank.support_bank
         pa_numbers_list = await user_bank.payment_accounts.all().values_list("number", flat=True)
@@ -40,8 +47,8 @@ class Balance:
     async def load(self) -> None:
         """
         Основная функция, для обновления балансов расчетных счетов в бд
-
         """
+
         await Logger(APP_NAME).info(msg="Начат процесс подгрузки балансов.", func_name='load_balances')
 
         users_banks = await UserBank.all()
