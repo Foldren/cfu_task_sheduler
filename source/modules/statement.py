@@ -4,22 +4,14 @@ from cryptography.fernet import Fernet
 from banks.module import Module
 from banks.tinkoff import Tinkoff
 from banks.tochka import Tochka
-from config import SECRET_KEY
+from config import SECRET_KEY, APP_NAME
 from db_models.telegram import Counterparty
 from decorators import exception_handler
 from db_models.bank import PaymentAccount, UserBank, DataCollect
+from modules.logger import Logger
 
 
 class Statement:
-    @staticmethod
-    async def status_message(status: str):
-        time_msg = str(datetime.now())[:-3].replace('.', ',')
-        match status:
-            case 'start_load':
-                print(f"[{time_msg}][MESSAGE   ][statement]: Start load statement")
-            case 'end_load':
-                print(f"[{time_msg}][MESSAGE   ][statement]: Loading statement is complete!")
-
     @staticmethod
     async def __load_payment_account_statement(payment_account: PaymentAccount) -> list:
         bank = await payment_account.user_bank.first().select_related('support_bank')
@@ -55,7 +47,7 @@ class Statement:
 
         return statements
 
-    @exception_handler
+    @exception_handler(app=APP_NAME, func_name="load_statement", msg="Загрузка балансов прервана.")
     async def load(self) -> None:
         """
         Основная функция, для генерации списка строк с операциями data_collect,
@@ -64,12 +56,13 @@ class Statement:
         :return:
         """
 
-        await self.status_message('start_load')
+        await Logger(APP_NAME).info(msg="Начат процесс подрузки выписок.", func_name="load_statement")
 
         try:
             banks = await UserBank.all()
         except TypeError:
-            await self.status_message('end_load')
+            await Logger(APP_NAME).error(msg="Подгрузка выписок не завершена, в базе нет ниодного банка.",
+                                         func_name="load_statement")
             return
 
         data_collects = []
@@ -105,9 +98,9 @@ class Statement:
                         # Создаем контрагентов
                         await Counterparty.bulk_create(new_counterparties, ignore_conflicts=True)
 
-                except Exception:
-                    print(format_exc())
-                    # continue
+                except Exception as e:
+                    await Logger(APP_NAME).error(msg=f"Невозможно подгрузить выписки по данному счету. Ошибка: {e}",
+                                                 func_name="load_statement")
 
         await DataCollect.bulk_create(data_collects, ignore_conflicts=True)
-        await self.status_message('end_load')
+        await Logger(APP_NAME).info(msg="Процесс подрузки выписок завершен.", func_name="load_statement")

@@ -3,4 +3,4 @@ from config import TORTOISE_CONFIG
 
 
 async def init_db():
-    await Tortoise.init(TORTOISE_CONFIG)
+    await Tortoise.init(config=TORTOISE_CONFIG)

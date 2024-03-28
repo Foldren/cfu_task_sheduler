@@ -2,20 +2,13 @@ from cryptography.fernet import Fernet
 from banks.module import Module
 from banks.tinkoff import Tinkoff
 from banks.tochka import Tochka
-from config import SECRET_KEY
+from config import SECRET_KEY, APP_NAME
 from decorators import exception_handler
 from db_models.bank import UserBank, PaymentAccount
+from modules.logger import Logger
 
 
 class Balance:
-    @staticmethod
-    async def status_message(status: str):
-        match status:
-            case 'start':
-                print("[message]: Start update balances")
-            case 'end':
-                print("[message]: Updating balances is complete!")
-
     @staticmethod
     async def __get_bank_rc_balances(user_bank: UserBank) -> dict:
         decrypt_token = Fernet(SECRET_KEY).decrypt(user_bank.token).decode('utf-8')
@@ -43,13 +36,13 @@ class Balance:
 
         return balances
 
-    @exception_handler
+    @exception_handler(app=APP_NAME, func_name="load_balances", msg="Загрузка балансов прервана.")
     async def load(self) -> None:
         """
         Основная функция, для обновления балансов расчетных счетов в бд
 
         """
-        await self.status_message("start")
+        await Logger(APP_NAME).info(msg="Начат процесс подгрузки балансов.", func_name='load_balances')
 
         users_banks = await UserBank.all()
 
@@ -69,6 +62,6 @@ class Balance:
         if payment_accounts:
             await PaymentAccount.bulk_update(payment_accounts, fields=['balance'])
 
-        await self.status_message("end")
+        await Logger(APP_NAME).success(msg="Процесс подгрузки балансов завершен.", func_name='load_balances')
 
 
