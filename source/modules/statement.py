@@ -1,5 +1,6 @@
 from datetime import datetime
 from cryptography.fernet import Fernet
+from banks.alfa import Alfa
 from banks.module import Module
 from banks.tinkoff import Tinkoff
 from banks.tochka import Tochka
@@ -49,6 +50,12 @@ class Statement:
                 )
             case 'Точка':
                 statements = await Tochka.get_statement(
+                    token=decrypt_token,
+                    rc_number=payment_account.number,
+                    from_date=from_date,
+                )
+            case 'Альфа':
+                statements = await Alfa.get_statement(
                     token=decrypt_token,
                     rc_number=payment_account.number,
                     from_date=from_date,

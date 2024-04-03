@@ -1,4 +1,5 @@
 from cryptography.fernet import Fernet
+from banks.alfa import Alfa
 from banks.module import Module
 from banks.tinkoff import Tinkoff
 from banks.tochka import Tochka
@@ -12,7 +13,7 @@ class Balance:
     @staticmethod
     async def __get_bank_rc_balances(user_bank: UserBank) -> dict:
         """
-        Функция для подгрузки балансов по расчетным счета банка.
+        Функция для подгрузки балансов по расчетным счета банка
         
         :param user_bank: банк, по которому требуется подгрузить балансы UserBank
         :return: значения в формате dict[payment_account_number] = amount
@@ -37,6 +38,11 @@ class Balance:
                     )
                 case 'Точка':
                     balances = await Tochka.get_bank_pa_balances(
+                        token=decrypt_token,
+                        pa_numbers_list=pa_numbers_list,
+                    )
+                case 'Альфа':
+                    balances = await Alfa.get_bank_pa_balances(
                         token=decrypt_token,
                         pa_numbers_list=pa_numbers_list,
                     )
