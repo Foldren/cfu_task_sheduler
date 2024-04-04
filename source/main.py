@@ -44,8 +44,10 @@ async def delete_incorrect_declaration_notes():
 
     if inc_declarations:
         for declr in inc_declarations:
-            if declr.image_url is not None:
-                await ContentApi(declr.user_id).delete(file_url=declr.image_url)
+            if declr.xlsx_image_url is not None:
+                await ContentApi(declr.user_id).delete(file_url=declr.xlsx_image_url)
+            if declr.xml_image_url is not None:
+                await ContentApi(declr.user_id).delete(file_url=declr.xml_image_url)
 
         await query.delete()
 
