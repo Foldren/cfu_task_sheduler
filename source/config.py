@@ -26,3 +26,9 @@ PROXY6NET_PROXIES = {"socks5://": environ['PROXY_HTTPS_URL']}
 JWT_SECRET = environ['JWT_SECRET']
 
 APP_NAME = "task_sheduler"
+
+SBER_MAIL_LOGIN = environ['SBER_MAIL_LOGIN']
+
+SBER_MAIL_PASSW = environ['SBER_MAIL_PASSW']
+
+IMAP_SERVER = "imap.yandex.ru"
