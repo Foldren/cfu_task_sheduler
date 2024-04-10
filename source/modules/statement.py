@@ -2,6 +2,7 @@ from datetime import datetime
 from cryptography.fernet import Fernet
 from banks.alfa import Alfa
 from banks.module import Module
+from banks.sber import Sber
 from banks.tinkoff import Tinkoff
 from banks.tochka import Tochka
 from config import SECRET_KEY, APP_NAME
@@ -67,7 +68,46 @@ class Statement:
 
         return statements
 
-    @exception_handler(app=APP_NAME, func_name="load_statement", msg="Загрузка балансов прервана.")
+    @exception_handler(app=APP_NAME, func_name="load_email_statement", msg="Подгрузка выписок с почты прервана.")
+    async def load_from_emails(self) -> None:
+        """
+        Функция, для генерации списка строк с операциями data_collect,
+        с последующим добавлением в бд (подгрузка с почты)
+        """
+
+        await Logger(APP_NAME).info(msg="Начат процесс подрузки выписок с почты.", func_name="load_email_statement")
+
+        try:
+            banks = await UserBank.all()
+        except TypeError:
+            await Logger(APP_NAME).error(msg="Подгрузка выписок не завершена, в базе нет ниодного банка.",
+                                         func_name="load_email_statement")
+            return
+
+        pa_sber_credentials = await Sber.get_pa_credentials_from_email()
+
+        data_collects = []
+        for bank in banks:
+            payment_accounts = await bank.payment_accounts.all()
+
+            for payment_account in payment_accounts:
+                payment_account_stat = await self.__load_payment_account_statement(payment_account)
+
+                for operation in payment_account_stat:
+                    data_collects.append(DataCollect(
+                        payment_account_id=payment_account.id,
+                        trxn_id=operation['op_id'],
+                        trxn_date=operation['op_date'],
+                        counterparty_name=operation['partner_name'],
+                        type=operation['op_type'],
+                        support_bank_id=support_bank.id,
+                        amount=operation['op_volume'],
+                        counterparty_inn=operation['partner_inn'],
+                    ))
+
+
+
+    @exception_handler(app=APP_NAME, func_name="load_statement", msg="Подгрузка выписок прервана.")
     async def load(self) -> None:
         """
         Основная функция, для генерации списка строк с операциями data_collect,

@@ -11,4 +11,4 @@ PyJWT==2.8.0
 termcolor==2.4.0
 pytz==2023.3.post1
 beautifulsoup4==4.12.3
-imbox==0.9.8
+imap-tools==1.6.0

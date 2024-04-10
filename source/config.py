@@ -27,8 +27,8 @@ JWT_SECRET = environ['JWT_SECRET']
 
 APP_NAME = "task_sheduler"
 
-SBER_MAIL_LOGIN = environ['SBER_MAIL_LOGIN']
+MAIL_LOGIN = environ['MAIL_LOGIN']
 
-SBER_MAIL_PASSW = environ['SBER_MAIL_PASSW']
+MAIL_PASSW = environ['MAIL_PASSW']
 
 IMAP_SERVER = "imap.yandex.ru"
