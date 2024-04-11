@@ -1,9 +1,8 @@
-from asyncio import run
 from datetime import datetime, timedelta
 from typing import Any
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
-from httpx import AsyncClient, ConnectTimeout
+from httpx import AsyncClient
 from imap_tools import MailBox, AND, OR, A, O
 from config import PROXY6NET_PROXIES, MAIL_PASSW, MAIL_LOGIN
 
@@ -13,9 +12,9 @@ class Sber:
     async def get_pa_credentials_from_email() -> dict[str, Any]:
         """
         Функция для получения доступных выписок со счетов, включая балансы счетов в Сбербанке (с датой начиная от
-        datetime.now() - timedelta(days=3))
+        datetime.now() - timedelta(days=2))
 
-        :return:
+        :return: dict объект в формате {'pa_number': {'date': date_operations, 'balance': 0.0, 'statements': []}, ... }
         """
 
         pa_credentials = {}
@@ -24,11 +23,10 @@ class Sber:
             # В запросе берем месседжы только с 2 почт + датой не позднее (сегодняшняя дата - 3 дня)
             query = AND(
                 OR(
-                    O(from_='k.demchenko@cfunalog.ru'),
                     O(from_='SberBusiness@sberbank.ru'),
                     O(from_='sbbol@sberbank.ru'),
                     ),
-                A(date_gte=(datetime.now() - timedelta(days=3)).date())
+                A(date_gte=(datetime.now() - timedelta(days=2)).date())
             )
 
             all_inbox_messages = inbox.fetch(query)
@@ -48,26 +46,24 @@ class Sber:
                     pa_number = msg_html_obj.find(string="Счет:").next.text
                     html_date_operations = msg_html_obj.find(string="Период:").next.text.split(" — ")[0]
 
-                date_operations = datetime.strptime(html_date_operations, '%d.%m.%Y')
+                date_operations = datetime.strptime(html_date_operations, '%d.%m.%Y').date()
 
                 # Создаем список выписок для расчетного счета по указанной дате
                 if pa_number not in pa_credentials:
-                    pa_credentials[pa_number] = {'date': date_operations, 'balance': 0.0, 'statements': []}
+                    pa_credentials[pa_number] = {'date': date_operations, 'balance': None, 'statements': []}
 
                 try:
                     async with AsyncClient(proxies=PROXY6NET_PROXIES, verify=False) as async_session:
                         r_download_st = await async_session.get(
-                            # https://www.dropbox.com/scl/fi/jrdvhnfar0nggz4iueb0g/zip_test-8.zip?rlkey=rcuug4v5p1bpscu2seapbl73t&dl=1
-                            # https://www.dropbox.com/scl/fi/at3f7tyhvnpi2vcbpyjat/v8_D805_269.txt?rlkey=qbap6ooupsjty439dnlwjhan5&dl=1
                             url=url_download_st,
                             follow_redirects=True,
-                            headers={'User-Agent': UserAgent().random}, timeout=4)
+                            headers={'User-Agent': UserAgent().random}, timeout=7)
 
                     # Если ссылка больше не активна
                     if r_download_st.status_code == 302:
                         continue
 
-                except ConnectTimeout:
+                except Exception:
                     continue
 
                 i = -1

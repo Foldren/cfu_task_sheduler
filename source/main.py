@@ -22,6 +22,16 @@ async def load_balances():
     await Balance().load()
 
 
+# Запускаем в 2 утра каждый день
+@aiocron.crontab("0 2 * * *", tz=timezone("Europe/Moscow"))
+async def load_with_balance_from_emails():
+    """
+    Таск на подгрузку выписок в user_data_collects из почт (пока только Сбер)
+    """
+
+    await Statement().load_with_balance_from_emails()
+
+
 # Запускаем в 4 утра каждый день
 @aiocron.crontab("0 4 * * *", tz=timezone("Europe/Moscow"))
 async def load_statements():
