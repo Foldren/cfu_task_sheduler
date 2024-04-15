@@ -1,10 +1,7 @@
 from asyncio import run
 from datetime import datetime
-from traceback import print_exc
-
 from cryptography.fernet import Fernet
 from tortoise import run_async
-
 from banks.alfa import Alfa
 from banks.module import Module
 from banks.sber import Sber
@@ -75,7 +72,7 @@ class Statement:
         return statements
 
     @exception_handler(app=APP_NAME, func_name="load_email_statement", msg="Подгрузка выписок с почты прервана.")
-    async def load_with_balance_from_emails(self) -> None:
+    async def load_with_balances_from_emails(self) -> None:
         """
         Функция, для генерации списка строк с операциями data_collect,
         с последующим добавлением в бд (подгрузка с почты), а также обновлением балансов через почту (на данный момент
@@ -197,4 +194,4 @@ class Statement:
 
 if __name__ == "__main__":
     run_async(init_db())
-    run(Statement().load_with_balance_from_emails())
+    run(Statement().load_with_balances_from_emails())

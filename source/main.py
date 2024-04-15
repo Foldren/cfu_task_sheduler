@@ -24,12 +24,12 @@ async def load_balances():
 
 # Запускаем в 2 утра каждый день
 @aiocron.crontab("0 2 * * *", tz=timezone("Europe/Moscow"))
-async def load_with_balance_from_emails():
+async def load_with_balances_from_emails():
     """
     Таск на подгрузку выписок в user_data_collects из почт (пока только Сбер)
     """
 
-    await Statement().load_with_balance_from_emails()
+    await Statement().load_with_balances_from_emails()
 
 
 # Запускаем в 4 утра каждый день
@@ -69,6 +69,5 @@ async def delete_incorrect_declaration_notes():
 if __name__ == '__main__':
     loop = get_event_loop()
     loop.run_until_complete(Logger(APP_NAME).success(msg="Планировщик запущен.", func_name="startup"))
-
     run_async(init_db())
     get_event_loop().run_forever()

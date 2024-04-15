@@ -29,6 +29,6 @@ APP_NAME = "task_sheduler"
 
 MAIL_LOGIN = environ['MAIL_LOGIN']
 
-MAIL_PASSW = environ['MAIL_PASSW']
+MAIL_APP_PASSW = environ['MAIL_APP_PASSW']
 
 IMAP_SERVER = "imap.yandex.ru"

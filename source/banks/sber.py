@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 from httpx import AsyncClient
 from imap_tools import MailBox, AND, OR, A, O
-from config import PROXY6NET_PROXIES, MAIL_PASSW, MAIL_LOGIN
+from config import PROXY6NET_PROXIES, MAIL_APP_PASSW, MAIL_LOGIN
 
 
 class Sber:
@@ -19,7 +19,7 @@ class Sber:
 
         pa_credentials = {}
 
-        with MailBox(host="imap.mail.ru", port=993).login(username=MAIL_LOGIN, password=MAIL_PASSW) as inbox:
+        with MailBox(host="imap.mail.ru", port=993).login(username=MAIL_LOGIN, password=MAIL_APP_PASSW) as inbox:
             # В запросе берем месседжы только с 2 почт + датой не позднее (сегодняшняя дата - 3 дня)
             query = AND(
                 OR(
