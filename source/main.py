@@ -4,7 +4,7 @@ import aiocron
 from pytz import timezone
 from tortoise import run_async
 from config import APP_NAME
-from db_models.declaration import Declaration
+from db_models.document import Declaration
 from init_db import init_db
 from modules.balance import Balance
 from modules.content_api import ContentApi

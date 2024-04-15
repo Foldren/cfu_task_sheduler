@@ -9,12 +9,12 @@ IS_THIS_LOCAL = "Pycharm" in str(Path.cwd())
 TORTOISE_CONFIG = {
     "connections": {
         "bank": environ['BANK_PG_URL'],
-        "declaration": environ['DC_PG_URL'],
+        "document": environ['DC_PG_URL'],
         "telegram": environ['TG_PG_URL'],
     },
     "apps": {
         "bank": {"models": ["db_models.bank"], "default_connection": "bank"},
-        "declaration": {"models": ["db_models.declaration"], "default_connection": "declaration"},
+        "document": {"models": ["db_models.document"], "default_connection": "document"},
         "telegram": {"models": ["db_models.telegram"], "default_connection": "telegram"},
     }
 }
