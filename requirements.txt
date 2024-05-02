@@ -12,3 +12,4 @@ termcolor==2.4.0
 pytz==2023.3.post1
 beautifulsoup4==4.12.3
 imap-tools==1.6.0
+fake-useragent==1.5.1
